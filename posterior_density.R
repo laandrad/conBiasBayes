@@ -25,6 +25,12 @@ MCSample = function(X, currentTheta, muTheta, sigmaTheta) {
               k = sum(X)
               
               proposedTheta = rnorm(1, muTheta, sigmaTheta)
+              if (proposedTheta > 1) {
+                      proposedTheta = 0.99
+              } else if (proposedTheta < 0) {
+                      proposedTheta = 0.01
+              }
+
               pProposed = posterior(k, n, proposedTheta, muTheta, sigmaTheta)
               pCurrent = posterior(k, n, currentTheta, muTheta, sigmaTheta)
               
@@ -38,7 +44,7 @@ MCSample = function(X, currentTheta, muTheta, sigmaTheta) {
 } 
 
 ## iterate over a large number of times
-MCChain = function(X, nMC,  muTheta, sigmaTheta, burnIn = 1000) {
+MCChain = function(X, nMC,  muTheta, sigmaTheta, burnIn = 100) {
             initTheta = runif(1, 0, 1)
             # posterior sample space (PSS)
             pss = numeric(nMC)
@@ -47,8 +53,6 @@ MCChain = function(X, nMC,  muTheta, sigmaTheta, burnIn = 1000) {
             for (i in 2:nMC)
               pss[i] = MCSample(X, currentTheta = pss[i - 1], 
                                              muTheta, sigmaTheta)
-            return(list(
-                        finalChain = pss[-(1:burnIn)],
-                        rawChain = pss)
-                   )
+            
+            pss[-(1:burnIn)]
 }

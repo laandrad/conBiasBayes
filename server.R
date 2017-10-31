@@ -1,46 +1,53 @@
 library(shiny)
+library(plotly)
+library(dplyr)
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
                 
                 options(warn = -1)
+        
+                randomTheta = eventReactive(input$go, {
+                         runif(1)
+                })
                 
                 X = reactive({
                                 # The data
-                                TrueTheta = input$bias
                                 n = input$flips
-                                rbinom(n, 1, TrueTheta)
+                                rbinom(n, 1, randomTheta())
                 })
 
                 pss = reactive({
-                                source("../posterior_density.r", local = T)
+                                source("code/posteriordensity.R", local = T)
 
                                 # define number of replications
                                 nMC = input$lengthMCMC
-                                burnIn = input$burnIn
 
                                 # prior guess
                                 muTheta = input$priorMean
-                                sigmaTheta = input$priorSD
+                                sigmaTheta = 1 / input$priorPrecision
 
                                 # use random values from posterior and likelihood
                                 # to sample posterior space
-                                MCChain(X(), nMC, muTheta, sigmaTheta, burnIn)
+                                MCChain(X(), nMC, muTheta, sigmaTheta)
                 })
 
                 output$bayesPlot = renderPlotly({
                                 
-                                source("../BayesPlot.r", local = T)
+                                source("code/bayesplot.R", local = T)
                                 
                                 muTheta = input$priorMean
-                                sigmaTheta = input$priorSD
+                                sigmaTheta = 1 / input$priorPrecision
                                 
                                 posteriorPlot(X(),
                                               muTheta,
                                               sigmaTheta,
                                               pss()
                                               )
-
-  })
-  
+               })
+                
+                output$coinFlips = renderText({
+                        paste("\n", ifelse(X() == 1, "Heads,", "Tails,"))
+                        })
+                
 })

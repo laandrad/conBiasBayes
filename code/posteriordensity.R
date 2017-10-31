@@ -11,14 +11,16 @@ ProbTheta = function(theta, muTheta, sigmaTheta) {
 
 # Posterior function
 posterior = function(k, n, theta, muTheta, sigmaTheta) {
-              ProbXGivenTheta(k, n, theta) * ProbTheta(theta, muTheta, sigmaTheta)
+              ProbXGivenTheta(k, n, theta) * 
+                ProbTheta(theta, muTheta, sigmaTheta)
 }
 
 # Montecarlo Sampling
 ## randomly generate a theta value between 0 and 1
 ## randomly sample a value from X
 ## compute posterior probability of theta given x
-## if posterior of theta is larger than previous value take that theta value,
+## if posterior of theta is larger than previous value, 
+## randomly decide to take that theta value given its posterior prob.,
 ## else stick with prior theta
 MCSample = function(X, currentTheta, muTheta, sigmaTheta) {
               n = length(X)
@@ -33,8 +35,9 @@ MCSample = function(X, currentTheta, muTheta, sigmaTheta) {
 
               pProposed = posterior(k, n, proposedTheta, muTheta, sigmaTheta)
               pCurrent = posterior(k, n, currentTheta, muTheta, sigmaTheta)
+              probAccept = min(1, pProposed / pCurrent)
               
-              if (pProposed / pCurrent > 0.5) {
+              if (runif(1) < probAccept) {
                 plausibleTheta = proposedTheta
               } else {
                 plausibleTheta = currentTheta
@@ -44,7 +47,7 @@ MCSample = function(X, currentTheta, muTheta, sigmaTheta) {
 } 
 
 ## iterate over a large number of times
-MCChain = function(X, nMC,  muTheta, sigmaTheta, burnIn = 100) {
+MCChain = function(X, nMC,  muTheta, sigmaTheta) {
             initTheta = runif(1, 0, 1)
             # posterior sample space (PSS)
             pss = numeric(nMC)
@@ -54,5 +57,6 @@ MCChain = function(X, nMC,  muTheta, sigmaTheta, burnIn = 100) {
               pss[i] = MCSample(X, currentTheta = pss[i - 1], 
                                              muTheta, sigmaTheta)
             
+            burnIn = nMC / 10
             pss[-(1:burnIn)]
 }

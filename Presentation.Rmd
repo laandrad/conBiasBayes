@@ -1,0 +1,64 @@
+---
+title: "Estimating the Bias of a Coin using Bayesian Inference"
+author: "Alejandro Andrade"
+date: "10/31/2017"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(dplyr)
+library(plotly)
+```
+
+## Introduction
+The aim of this app is to use Bayesian inference to estimate the posterior beliefs of the bias of a coin. Suppose there is a mint, but you are not sure if the coins it mints are totally fair. One way to examine the bias of the mint is to flip several of its coins and estimate the probability of them landing heads. A Frequentist approach would require making a large number of flips, rely on the Central Limit Theorem, and computing the probability of the data given the null model is true.  
+  
+Another approach is to use Bayesian inference. In Bayesian inference, one poses an initial guess as to the possible bias of the coin (called the prior belief). One then flips a certain amount of coins and computes the observed probability of a coin landing heads (called the likelihood). Finally, one updates the initial belief in one’s guess by weighing in the observed evidence (called the posterior belief).
+
+## Bayesian Inference
+This simulation allows you to explore how modifying the prior belief effects the estimation of the posterior. That is, one can explore how the number of coin flips (or the strength of the evidence), the initial guess as to the possible bias, or the certainty about the initial guess, systematically effect the distribution of the posterior.  
+  
+The simulation uses a Monte Carlo Markov Chain method to calculate the posterior distribution. The prior is specified as a normal distribution with mean equal to the initial guess, and standard deviation equal to the inverse of the precision around that initial guess. The likelihood is computed as a Bernoulli distribution of N flips, and probability of success given by the plausible theta value calculated at every step in the MCMC’s random walk.
+
+## Example
+```{r example, echo=TRUE, results='hide'}
+# The data
+n = 30
+X = rbinom(n, 1, runif(1))
+
+## define number of replications
+nMC = 3000
+
+## initialize posterior sample space with a prior guess
+muTheta = 0.5
+sigmaTheta = 0.2
+
+# Sample posterior space
+source("code/posteriordensity.R")
+pss = MCChain(X, nMC, muTheta, sigmaTheta)
+
+source("code/bayesplot.R")
+posteriorPlot(X, muTheta, sigmaTheta, pss)
+```
+
+## Results
+```{r results}
+# The data
+n = 30
+X = rbinom(n, 1, runif(1))
+
+## define number of replications
+nMC = 3000
+
+## initialize posterior sample space with a prior guess
+muTheta = 0.5
+sigmaTheta = 0.2
+
+# Sample posterior space
+source("code/posteriordensity.R")
+pss = MCChain(X, nMC, muTheta, sigmaTheta)
+
+source("code/bayesplot.R")
+posteriorPlot(X, muTheta, sigmaTheta, pss)
+```

@@ -1,0 +1,12 @@
+name: CoinBiasBayes
+title: CoinBiasBayes
+username:
+account: laandrad
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 229857
+bundleId: 1054068
+url: https://laandrad.shinyapps.io/CoinBiasBayes/
+when: 1509487486.62529
+asMultiple: FALSE
+asStatic: FALSE

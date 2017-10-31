@@ -1,15 +1,6 @@
 posteriorPlot = function(X, muTheta, sigmaTheta, pss) {
-  if (!require(plotly)) {
-        install.packages("plotly")
-  }
-  if (!require(dplyr)) {
-        install.packages("dplyr")
-  }
 
-  library(plotly)
-  library(dplyr)
-
-  prior = dnorm(seq(0, 1, .01), muTheta, sigmaTheta)
+  prior = dnorm(seq(0, 1, .04), muTheta, sigmaTheta)
   likelihood = dbinom(seq_along(X), length(X), mean(X))
   poster = hist(pss, plot = F)
   
@@ -45,13 +36,15 @@ posteriorPlot = function(X, muTheta, sigmaTheta, pss) {
                line = list(simplyfy = F)
               ) %>% 
         layout(xaxis = list(
-                  title = "Step in the Chain",
+                  title = "MCMC Random Walk",
                   zeroline = F),
                yaxis = list(
-                  title = "Value of Plausible Theta",
-                  zeroline = F)
+                  title = "Plausible Theta",
+                  zeroline = F,
+                  range = c(0, 1))
                )
   
-  subplot(p1, p2, nrows = 2, margin = 0.1, titleX = T, titleY = T)
+  subplot(p1, p2, nrows = 2, margin = 0.05, 
+          titleX = T, titleY = T, heights = c(0.4, 0.6))
   
 }
